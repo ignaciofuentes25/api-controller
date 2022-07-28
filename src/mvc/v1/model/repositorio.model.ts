@@ -9,7 +9,7 @@ export async function getStopForeverModel(req: any, res: any) {
   console.log(req.query);
   try {
     if (req.query.uid_api !== undefined) {
-      const mensaje = await detenerApi(req.query.uid_api);
+      await detenerApi(req.query.uid_api);
       res = msgHTTP.read200(res, "Api cerrada Correctamente.");
     } else {
       res = msgHTTP.read200(res, "El nombre de la api es obligatorio.");
@@ -24,8 +24,7 @@ export async function getStartForeverModel(req: any, res: any) {
   console.log(req.query);
   try {
     if (req.query.uid_api !== undefined) {
-      const mensajePath = await iniciarPath();
-      const mensaje = await iniciarApi(req.query.uid_api);
+      await iniciarApi(req.query.uid_api);
       res = msgHTTP.read200(res, "La api ha sido iniciada correctamente.");
     } else {
       res = msgHTTP.read200(res, "El nombre de la api es obligatorio.");
