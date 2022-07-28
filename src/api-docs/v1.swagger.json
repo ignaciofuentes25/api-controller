@@ -59,6 +59,54 @@
           }
         }
       }
+    },
+    "/repositorio/iniciar": {
+      "get": {
+        "tags": ["Repositorios"],
+        "summary": "Inicia una aplicacion segun su uid",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "uid_api",
+            "in": "query",
+            "type": "string",
+            "format": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/success_administracion"
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "403": {
+            "description": "Error: Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "500": {
+            "description": "Error: Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
