@@ -1,0 +1,97 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Administracion API's",
+    "description": "Documentacion Administracion API's."
+  },
+  "host": "",
+  "basePath": "/api/v1",
+  "tags": [],
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/repositorio/detener": {
+      "get": {
+        "tags": ["Repositorios"],
+        "summary": "Detiene una aplicacion que este en ejecucion segun su uid",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "uid_api",
+            "in": "query",
+            "type": "string",
+            "format": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/success_administracion"
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "403": {
+            "description": "Error: Not Found",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "500": {
+            "description": "Error: Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "success_administracion": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "status": { "type": "integer", "format": "int64" },
+        "message": { "type": "string", "format": "string" },
+        "row_length": { "type": "integer", "format": "int64" },
+        "data": {
+          "items": {
+            "$ref": "#/definitions/no_data"
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "status": { "type": "integer", "format": "int64" },
+        "message": { "type": "string", "format": "string" },
+        "row_length": { "type": "integer", "format": "int64" },
+        "data": {
+          "items": {
+            "$ref": "#/definitions/no_data"
+          }
+        }
+      }
+    },
+    "no_data": {
+      "properties": {}
+    }
+  }
+}

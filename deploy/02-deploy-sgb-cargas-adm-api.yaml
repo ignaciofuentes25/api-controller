@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sgb-cargas-adm-api
+  name: sgb-cargas-adm-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sgb-cargas-adm-api
+  template:
+    metadata:
+      labels:
+        app: sgb-cargas-adm-api
+    spec:
+      containers:
+      - image: __IMAGE__
+        name: sgb-cargas-adm-api
+        env:
+        - name: PORT
+          value: "3000"
+        - name: HOST_URL
+          value: "https://__DOMAIN_NAME__"
+        - name: NODE_ENV
+          value: "__NODE_ENV__"
+        - name: DB_CONNSTR
+          value: "__DB_CONNSTR__"
+        - name: DB_USR
+          valueFrom:
+            secretKeyRef:
+              name: sgb-cargas-adm-api
+              key: DB_USR
+        - name: DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: sgb-cargas-adm-api
+              key: DB_PWD
+        - name: MAX_ITEMS
+          value: "__MAX_ITEMS__"
+        - name: AUTH_SERVICE
+          value: "__AUTH_SERVICE__"
+        - name: AUTH_DOMAIN
+          value: "__AUTH_DOMAIN__"
+        - name: AUTH_ENABLED
+          value: "__AUTH_ENABLED__"
+        - name: AUTH_EXPIRES
+          value: "__AUTH_EXPIRES__"
+        - name: AUTH_SECRETKEY
+          value: "__AUTH_SECRETKEY__"

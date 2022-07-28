@@ -1,0 +1,116 @@
+stages:
+  - build_image
+  - deploy
+    
+build_image:
+    stage: build_image
+    tags: 
+        - DOCKER
+    environment:
+        name: dev
+    image: docker:18-git
+    variables:
+        DOCKER_HOST: tcp://docker:2375/
+        DOCKER_DRIVER: overlay2
+    services:
+      - name: docker:18-dind
+    only:
+        - dev
+        - master
+    allow_failure: false
+    script:
+        - echo "${REGISTRY_PASSWORD}" | docker login -u "${REGISTRY_USER}" --password-stdin  ${REGISTRY_URL}
+        - docker build -t ${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA} .
+        - docker tag ${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA} ${REGISTRY_URL}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+        - docker push ${REGISTRY_URL}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
+
+k8s_deploy_dev:
+  stage: deploy
+  tags:
+    - build
+  image: msalinas92/openshift-client:v195929052021
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  services:
+    - name: docker:18-dind
+  when: on_success
+  only:
+    - dev
+  script:
+    - |
+      helm upgrade --install ${CI_PROJECT_NAME} ./helm \
+      --set "secrets.DB_USR=${APP_QA_DB_USR}" \
+      --set "secrets.DB_PWD=${APP_QA_DB_PWD}" \
+      --set "env.DB_CONNSTR=${APP_QA_DB_CONNSTR}" \
+      --set route.first_ca="$(echo -n "$HELM_FIRST_CA" | base64 -d)" \
+      --set route.second_ca="$(echo -n "$HELM_SECOND_CA" | base64 -d)" \
+      --set route.cert="$(echo -n "$HELM_CERT" | base64 -d)" \
+      --set route.key="$(echo -n "$HELM_KEY" | base64 -d)" \
+      --set image.repository=$REGISTRY_URL/$CI_PROJECT_NAME \
+      --set image.tag=$CI_COMMIT_SHORT_SHA \
+      --set type="RANCHER" \
+      --namespace $NAMESPACE_QA \
+      -f ./helm/qa-values.yaml
+
+k8s_deploy_prod:
+  stage: deploy
+  tags:
+    - build
+  image: msalinas92/openshift-client:v195929052021
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  services:
+    - name: docker:18-dind
+  when: manual
+  only:
+    - master
+  script:
+    - |
+      helm upgrade --install ${CI_PROJECT_NAME} ./helm \
+      --set "secrets.DB_USR=${APP_PROD_DB_USR}" \
+      --set "secrets.DB_PWD=${APP_PROD_DB_PWD}" \
+      --set "env.DB_CONNSTR=${APP_PROD_DB_CONNSTR}" \
+      --set route.first_ca="$(echo -n "$HELM_FIRST_CA" | base64 -d)" \
+      --set route.second_ca="$(echo -n "$HELM_SECOND_CA" | base64 -d)" \
+      --set route.cert="$(echo -n "$HELM_CERT" | base64 -d)" \
+      --set route.key="$(echo -n "$HELM_KEY" | base64 -d)" \
+      --set image.repository=$REGISTRY_URL/$CI_PROJECT_NAME \
+      --set image.tag=$CI_COMMIT_SHORT_SHA \
+      --set type="RANCHER" \
+      --namespace $NAMESPACE_PROD \
+      -f ./helm/prod-values.yaml
+
+AKS_prod_deploy:
+  stage: deploy
+  tags:
+    - DOCKER
+  image: 
+    name: alpine/helm
+    entrypoint: [""]
+  when: manual
+  only:
+    - master
+  before_script:
+    - apk --update add bash py3-pip
+    - apk add --virtual=build gcc libffi-dev musl-dev openssl-dev python3-dev make
+    - pip --no-cache-dir install -U pip
+    - pip --no-cache-dir install azure-cli
+    - az login --service-principal -u ${APPLICATION_ID} -p ${APPLICATION_SECRET} --tenant ${TENANT_ID}
+    - az aks get-credentials --resource-group PPTA-RG --name aks_sto_tomas
+  script:
+    - |
+      echo "image: $REGISTRY_URL/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA"
+      helm upgrade --install ${CI_PROJECT_NAME} ./helm \
+      --set "secret.DB_USR=$APP_PROD_DB_USR" \
+      --set "secret.DB_PWD=$APP_PROD_DB_PWD" \
+      --set route.first_ca="$(echo -n "$HELM_FIRST_CA" | base64 -d)" \
+      --set route.second_ca="$(echo -n "$HELM_SECOND_CA" | base64 -d)" \
+      --set route.cert="$(echo -n "$HELM_CERT" | base64 -d)" \
+      --set route.key="$(echo -n "$HELM_KEY" | base64 -d)" \
+      --set image.repository=$REGISTRY_URL/$CI_PROJECT_NAME \
+      --set image.tag=$CI_COMMIT_SHORT_SHA \
+      --set type="AKS" \
+      --namespace ${AKS_NAMESPACE_PROD} \
+      -f ./helm/prod-values.yaml

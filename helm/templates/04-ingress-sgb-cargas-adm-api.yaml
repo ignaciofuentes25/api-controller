@@ -1,0 +1,29 @@
+{{ if eq .Values.type "OKD" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "helm.fullname" . }}
+spec:
+  host: {{ .Values.route.domain }}
+  tls:
+    caCertificate: |+
+      -----BEGIN CERTIFICATE-----
+{{ .Values.route.first_ca | indent 2 }}     
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+{{ .Values.route.second_ca | indent 2 }}
+      -----END CERTIFICATE-----
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+{{ .Values.route.cert | indent 2 }}
+      -----END CERTIFICATE-----
+    insecureEdgeTerminationPolicy: Redirect
+    key: |
+      -----BEGIN RSA PRIVATE KEY-----
+{{ .Values.route.key | indent 2 }}
+      -----END RSA PRIVATE KEY-----
+    termination: edge
+  to:
+    kind: "Service"
+    name: {{ include "helm.fullname" . }}
+{{ end }}

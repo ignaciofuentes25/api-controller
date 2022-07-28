@@ -1,0 +1,61 @@
+replicaCount: 1
+
+image:
+  repository: registryopenshift.azurecr.io/sgb-cargas-adm-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+imagePullSecrets:
+- name: sto-tomas-registry
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+ingress:
+  domain: sgb-cargas-adm-api.santotomas.cl
+  path: "/"
+
+route:
+  domain: sgb-cargas-adm-api.santotomas.cl
+  first_ca: ""
+  second_ca: ""
+  cert: ""
+  key: ""
+
+
+secrets:
+  DB_PWD: "Tm9uZQ=="
+  DB_USR: "Tm9uZQ=="
+
+env:
+  DOMAIN_NAME: "sgb-cargas-adm-api.santotomas.cl"
+  NODE_ENV: "production"
+  DB_CONNSTR: "CST_ADM.WORLD" 
+  PORT: "3000"
+  MAX_ITEMS: ""
+  AUTH_SERVICE: "" 
+  AUTH_DOMAIN: ""
+  AUTH_ENABLED: ""
+  AUTH_EXPIRES: ""
+  AUTH_SECRETKEY: "" 
+  DB_POOLINCREMENT: "5"
+  DB_POOLMAX: "20"
+  DB_POOLMIN: "10"
+  LOG_REQUEST: "false"

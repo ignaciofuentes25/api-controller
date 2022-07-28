@@ -1,0 +1,10 @@
+{
+    "autorizados": [
+       { "usuario": "rpardo", "estado": "A", "modulos": [{ "verbo": "GET", "ruta": "*" }, { "verbo": "POST", "ruta": "*" }] },
+       { "usuario": "psazop", "estado": "A", "modulos": [{ "verbo": "GET", "ruta": "*" }, { "verbo": "POST", "ruta": "*" }] },
+       { "usuario": "lallendes", "estado": "A", "modulos": [{ "verbo": "GET", "ruta": "*" }, { "verbo": "POST", "ruta": "*" }] },
+       { "usuario": "jespinoza", "estado": "A", "modulos": [{ "verbo": "GET", "ruta": "*" }, { "verbo": "POST", "ruta": "*" }] },
+       { "usuario": "srv.alubeneficios", "estado": "A", "modulos": [{ "verbo": "GET", "ruta": "*" }, { "verbo": "POST", "ruta": "*" }] }
+    ]
+ }
+ 
