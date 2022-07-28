@@ -44,12 +44,6 @@ async function detenerApi(api: string) {
 }
 
 async function iniciarApi(api: string) {
-  const exportPath = exec(
-    "export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_7:$LD_LIBRARY_PATH"
-  );
-
-  exportPath.stdout?.pipe(process.stdout);
-
   const startForever = exec(
     "forever -a --uid " +
       api +
