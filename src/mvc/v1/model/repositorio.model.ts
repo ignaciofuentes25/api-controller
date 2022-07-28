@@ -24,6 +24,7 @@ export async function getStartForeverModel(req: any, res: any) {
   console.log(req.query);
   try {
     if (req.query.uid_api !== undefined) {
+      const mensajePath = await iniciarPath();
       const mensaje = await iniciarApi(req.query.uid_api);
       res = msgHTTP.read200(res, "La api ha sido iniciada correctamente.");
     } else {
@@ -53,6 +54,16 @@ async function iniciarApi(api: string) {
   );
 
   const resultado = startForever.stdout?.pipe(process.stdout);
+
+  return resultado;
+}
+
+async function iniciarPath() {
+  const exportPath = exec(
+    "export LD_LIBRARY_PATH=/opt/oracle/instantclient_21_7:$LD_LIBRARY_PATH"
+  );
+
+  const resultado = exportPath.stdout?.pipe(process.stdout);
 
   return resultado;
 }
