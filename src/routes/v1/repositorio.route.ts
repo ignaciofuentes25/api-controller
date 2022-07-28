@@ -1,4 +1,7 @@
-import { getStopForever } from "../../mvc/v1/controller/repositorio.controller";
+import {
+  getStopForever,
+  getStartForever,
+} from "../../mvc/v1/controller/repositorio.controller";
 
 /**
  * API Version: v1
@@ -20,5 +23,7 @@ DELETE: Eliminar una entidad
 */
 
 router.get("/detener", getStopForever);
+
+router.get("/iniciar", getStartForever);
 
 module.exports = router;
